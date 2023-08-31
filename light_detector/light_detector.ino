@@ -13,7 +13,7 @@ SR04 sr04 = SR04(ECHO_PIN, TRIG_PIN);
 
 // CONSTANTES
 // ------------------------
-long a;
+long distance;
 bool DEBUG = false;
 const int sensorPin = A0;
 const int sensorMiddlePin = A5;
@@ -24,6 +24,9 @@ const int rightLed = 2;
 
 const int alertRedLed = A4;
 const int alertBlueLed = A3;
+
+const int tempLimit = 28;
+const int distanceLimit = 50;
 
 
 float h = dht.readHumidity();
@@ -52,7 +55,7 @@ void setup() {
 }
 
 void loop() {
-  a = sr04.Distance();
+  distance = sr04.Distance();
   sensorValue = analogRead(sensorPin);
   sensorMiddlevalue = analogRead(sensorMiddlePin);
   int val = sensorValue + sensorMiddlevalue;
@@ -60,7 +63,7 @@ void loop() {
 
   if (DEBUG) {
     Serial.print("Distance cm: ");
-    Serial.println(a);
+    Serial.println(distance);
     Serial.print("Luminosity: ");
     Serial.println(val);
     Serial.print("Temperature: ");
@@ -71,7 +74,7 @@ void loop() {
   float h = dht.readHumidity();
   float t = dht.readTemperature();
 
-  if (t >= 28) {
+  if (t >= tempLimit) {
     digitalWrite(alertBlueLed, HIGH);
     delay(300);
     digitalWrite(alertBlueLed, LOW);
@@ -80,7 +83,7 @@ void loop() {
     digitalWrite(alertRedLed, LOW);
   }
 
-  if (a < 50) {
+  if (distance <= distanceLimit) {
     delay(500);
     digitalWrite(leftLed, HIGH);
     delay(500);
