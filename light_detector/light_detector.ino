@@ -25,8 +25,11 @@ const int rightLed = 2;
 const int alertRedLed = A4;
 const int alertBlueLed = A3;
 
-const int tempLimit = 28;
+const int tempLimit = 27;
 const int distanceLimit = 50;
+const long interval = 20000;
+const int delayBetweenLight = 500;
+int passage = 0;
 
 
 float h = dht.readHumidity();
@@ -35,6 +38,27 @@ int sensorValue = 0;
 int sensorMiddlevalue = 0;
 
 bool lightOn = false;
+
+
+
+void switchOffLights() {
+ 
+  delay(delayBetweenLight);
+  digitalWrite(leftLed, LOW);
+  delay(delayBetweenLight);
+  digitalWrite(rightLed, LOW);
+  delay(delayBetweenLight);
+  digitalWrite(middleLed, LOW);
+}
+
+void switchOnLights() {
+  delay(delayBetweenLight);
+  digitalWrite(leftLed, HIGH);
+  delay(delayBetweenLight);
+  digitalWrite(rightLed, HIGH);
+  delay(delayBetweenLight);
+  digitalWrite(middleLed, HIGH);
+}
 
 
 void setup() {
@@ -81,24 +105,26 @@ void loop() {
     digitalWrite(alertRedLed, HIGH);
     delay(300);
     digitalWrite(alertRedLed, LOW);
+  } else {
+    digitalWrite(alertBlueLed, LOW);
+    digitalWrite(alertRedLed, LOW);
   }
 
+
+
   if (distance <= distanceLimit) {
-    delay(500);
-    digitalWrite(leftLed, HIGH);
-    delay(500);
-    digitalWrite(rightLed, HIGH);
-    delay(500);
-    digitalWrite(middleLed, HIGH);
-    delay(20900);
+    passage += 1;
+  }
 
-  } else {
+  if (passage > 1) {
+    switchOffLights();
+    passage = 0;
+    delay(8000); // wait 20s to make sure no false positive
+  }
 
-    digitalWrite(leftLed, LOW);
-    delay(500);
-    digitalWrite(middleLed, LOW);
-    delay(500);
-    digitalWrite(rightLed, LOW);
-    delay(500);
+  if (distance <= distanceLimit && val <= 2) {
+    if (passage == 0) {
+     switchOnLights(); // keep light on
+    }
   }
 }
